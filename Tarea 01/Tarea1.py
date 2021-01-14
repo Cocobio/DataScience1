@@ -35,13 +35,12 @@ if web_scrap:
 
 		data_dict[headers[0]] += game_titles
 		data_dict[headers[1]] += [d.text for d in soup.find_all('div', attrs={'class':'search_released'})]
-		
-		normal_price = [float(''.join(filter(lambda x: x.isdigit(), '0' if not d.find('span') else d.find('span').text.split('$')[-1].strip()))) for d in soup.find_all('div', attrs={'class':'search_price'})]
-		data_dict[headers[2]] += normal_price
 
-		discount_price = [d.text.split('$')[-1].strip() for d in soup.find_all('div', attrs={'class':'search_price'})]
-		discount_price = ['0' if (d.find('Free')!=-1 or d.find('Gratuito')!=-1) else float('Nan') if len(d)==0 else ''.join(filter(lambda x: x.isdigit(), d)) for d in discount_price]
-		data_dict[headers[3]] += [float(d) for d in discount_price]
+		normal_price = [float(''.join(filter(lambda x: x.isdigit(), '0' if d.text.find('$')==-1 else d.text.split('$')[1].strip()) ))      for d in soup.find_all('div', attrs={'class':'search_price'})]
+		data_dict[headers[2]] += normal_price
+	
+		discount_price = [float('Nan' if not d.find('span') else '0' if d.text.split('$')[-1].strip().find('Free')!=-1 else ''.join(filter(lambda x: x.isdigit(), d.text.split('$')[-1].strip())))      for d in soup.find_all('div', attrs={'class':'search_price'})]
+		data_dict[headers[3]] += discount_price
 		
 		data_dict[headers[4]] += [(0 if d.find('span',attrs={'mixed'}) else 1 if d.find('span',attrs={'positive'}) else -1 if d.find('span',attrs='negative') else float('Nan')) for d in soup.find_all('div',attrs={'search_reviewscore'})]
 		
@@ -57,81 +56,68 @@ if web_scrap:
 ####################################################################
 					# TABLE WORK
 ####################################################################
-
 ##### Exercise 1
-print('*'*70)
-print('\n\nExercise 1: Cheapest 10 games, excluding the ones that are already free')
+# print('*'*70)
+# print('\n\nExercise 1: Cheapest 10 games, excluding the ones that are already free')
 steam_scrapped = pd.read_csv(steam_data)
-cheapest_10 = steam_scrapped.drop_duplicates(headers[0])
-filter_free = cheapest_10[headers[2]]>0
+# cheapest_10 = steam_scrapped.drop_duplicates(headers[0])
+# filter_free = cheapest_10[headers[2]]>0
 
-cheapest_10 = cheapest_10[filter_free]
-cheapest_10.sort_values(headers[3], inplace=True)
+# cheapest_10 = cheapest_10[filter_free]
+# cheapest_10.sort_values(headers[3], inplace=True)
 
-print(cheapest_10.head(10)[[headers[0],headers[2],headers[3]]])
+# print(cheapest_10.head(10)[[headers[0],headers[2],headers[3]]])
 
-##### Exercise 2
-win_mac_linux = steam_scrapped.drop_duplicates(headers[0])
-win_mac_linux = win_mac_linux[win_mac_linux[headers[5]]==7]
+# ##### Exercise 2
+# win_mac_linux = steam_scrapped.drop_duplicates(headers[0])
+# win_mac_linux = win_mac_linux[win_mac_linux[headers[5]]==7]
 
-print('*'*70)
-print('\n\nExercise 2: Games that work on windows, linux and mac')
-print(win_mac_linux[headers[0]])
+# print('*'*70)
+# print('\n\nExercise 2: Games that work on windows, linux and mac')
+# print(win_mac_linux[headers[0]])
 
-##### Exercise 3
-discount_game_under_5k = steam_scrapped.drop_duplicates(headers[0])
-discount_game_under_5k = discount_game_under_5k[discount_game_under_5k[headers[3]]<=5000]
+# ##### Exercise 3
+# discount_game_under_5k = steam_scrapped.drop_duplicates(headers[0])
+# discount_game_under_5k = discount_game_under_5k[discount_game_under_5k[headers[3]]<=5000]
 
-game_value_under_15k = steam_scrapped.drop_duplicates(headers[0])
-game_value_under_15k = game_value_under_15k[game_value_under_15k[headers[2]]<=15000]
-
-
-print('*'*70)
-print('\n\nExercise 3: Games with discount value under $5.000')
-print(discount_game_under_5k[[headers[0],headers[3]]])
-print('\n',game_value_under_15k[[headers[0],headers[2]]])
-
-##### Exercise 4
-avr_discount = steam_scrapped.drop_duplicates(headers[0])
-avr_discount = avr_discount[avr_discount[headers[3]]<avr_discount[headers[2]]]
-
-print('*'*70)
-print('\n\nExercise 4: Average value for games on discount:')
-print(avr_discount[headers[3]].mean())
-# print(avr_discount[[headers[0], headers[2],headers[3],headers[6]]])
+# game_value_under_15k = steam_scrapped.drop_duplicates(headers[0])
+# game_value_under_15k = game_value_under_15k[game_value_under_15k[headers[2]]<=15000]
 
 
-##### Exercise 5
-games_per_platform_data = steam_scrapped.drop_duplicates(headers[0])
-games_per_platform_data = games_per_platform_data[headers[5]].value_counts()
+# print('*'*70)
+# print('\n\nExercise 3: Games with discount value under $5.000')
+# print(discount_game_under_5k[[headers[0],headers[3]]])
+# print('\n',game_value_under_15k[[headers[0],headers[2]]])
 
-games_per_platform = pd.DataFrame({'Platform':['Windows','Windows & Mac', 'Windows & Linux', 'Windows, Mac & Linux', 'Unrecognized'], 'Count':games_per_platform_data[[1,3,5,7,0]]})
+# ##### Exercise 4
+# avr_discount = steam_scrapped.drop_duplicates(headers[0])
+# avr_discount = avr_discount[avr_discount[headers[3]]<avr_discount[headers[2]]]
 
-print('*'*70)
-print('\n\nExercise 5: Games per platform:')
-print(games_per_platform)
+# print('*'*70)
+# print('\n\nExercise 4: Average value for games on discount:')
+# print(avr_discount[headers[3]].mean())
+# # print(avr_discount[[headers[0], headers[2],headers[3],headers[6]]])
 
 
-##### Exercise 6
-cheapest_by_tag = steam_scrapped.groupby(headers[6]).agg(discount=pd.NamedAgg(column=headers[3], aggfunc='min'))
+# ##### Exercise 5
+# games_per_platform_data = steam_scrapped.drop_duplicates(headers[0])
+# games_per_platform_data = games_per_platform_data[headers[5]].value_counts()
 
-# cheapest_by_tag = pd.DataFrame({'Categoria':tags['Etiqueta'], 'Cheapest':[tag for tag in tags['Etiqueta']]})
-# cheapest_by_tag = cheapest_by_tag[[]]
-print('*'*70)
-print('\n\nExercise 6: Cheapest games with discount per tag:')
-# print(cheapest_by_tag)
-# for tag in tags['Etiqueta']:
-	# print(tag)
-# cheapest_by_tag = steam_scrapped
-# # cheapest_by_tag = cheapest_by_tag[cheapest_by_tag==tag and cheapest_by_tag[headers[2]]>cheapest_by_tag[headers[3]]]
+# games_per_platform = pd.DataFrame({'Platform':['Windows','Windows & Mac', 'Windows & Linux', 'Windows, Mac & Linux', 'Unrecognized'], 'Count':games_per_platform_data[[1,3,5,7,0]]})
 
-# pd.set_option('display.max_columns', 500)
-# for tag in tags['Etiqueta']:
-# 	by_tag = cheapest_by_tag[cheapest_by_tag[headers[6]]==tag and cheapest_by_tag[headers[2]]>cheapest_by_tag[headers[3]]]
-# 	# by_tag = cheapest_by_tag[cheapest_by_tag[by_tag][headers[2]]>cheapest_by_tag[by_tag][headers[3]]]
-# 	print(cheapest_by_tag[by_tag])
-# 	break
+# print('*'*70)
+# print('\n\nExercise 5: Games per platform:')
+# print(games_per_platform)
+
+
+# ##### Exercise 6
+# print('*'*70)
+# print('\n\nExercise 6: Cheapest games with discount per tag:')
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
-print(steam_scrapped.sort_values([headers[6],headers[3]]).drop_duplicates(headers[6]))
+# print(steam_scrapped.sort_values([headers[6],headers[3]]).drop_duplicates(headers[6]))
+
+
+
+print(steam_scrapped[steam_scrapped[headers[2]]==0])
