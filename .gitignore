@@ -3,3 +3,5 @@
 *sublime-workspace
 
 *.jpg
+
+**/__pycache__
