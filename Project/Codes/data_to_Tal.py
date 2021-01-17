@@ -6,9 +6,6 @@ import matplotlib.pyplot as plt
 from FFClust import IOFibers
 import os
 
-MIN_LENGTH = 10 #mm
-POINTS_PER_FIBER = 21
-
 def get_list_of_files(directory):
     files = [f for f in listdir(directory) if isfile(join(directory, f))]
     dirs = [f for f in listdir(directory) if not isfile(join(directory, f))]
@@ -16,6 +13,8 @@ def get_list_of_files(directory):
 
 directory = '/home/cocobio/Documents/ARCHI_Database/'
 fiber_dir = '/OverSampledFibers/'
+transform_dir_file = '/TransformMatrices/T2_to_Tal_tr_tmp.trm'
+
 files, subjects = get_list_of_files(directory)
 subjects.sort()
 fiber_data = []
@@ -25,27 +24,22 @@ n_fibers = []
 for subject in subjects:
     print('Processing', subject)
     subject_fibers_path = directory + subject + fiber_dir
+    subject_fibers_talairach_matrix = directory + subject + transform_dir_file
+
     fibers, tmp = get_list_of_files(subject_fibers_path)
     del tmp
-    fibers = [f for f in fibers if f.endswith('.bundles')]
+    
+    fibers = [f for f in fibers if f.endswith('.bundles') and f.find("_centroids") != -1]
+
     for f_path in fibers:
         f = subject_fibers_path + f_path
+        f_tal = f[:f.rindex('/')+1]+'Final/'+f[f.rindex('/')+1:f.find('.bundles')]+"_Tal"+f[f.find('.bundles'):]
 
-        # Eliminamos las fibras muy pequenias
-        f_filtered = f[:f.find('.bundles')]+"_filtered_under_"+str(MIN_LENGTH)+f[f.find('.bundles'):]
-        # print(    "python3 filtering/filtering.py "+f+" "+f_filtered+" "+str(MIN_LENGTH))
-        os.system("python3 filtering/filtering.py "+f+" "+f_filtered+" "+str(MIN_LENGTH))
+        if not os.path.exists(f_tal[:f_tal.rindex('/')]):
+            os.makedirs(f_tal[:f_tal.rindex('/')])
 
-        f = f_filtered
+        # print("python3 talairach/talairach.py "+f+" "+f_tal+" "+subject_fibers_talairach_matrix)
+        os.system("python3 talairach/talairach.py "+f+" "+f_tal+" "+subject_fibers_talairach_matrix)
 
-        # Resampling a 21 puntos
-        output_f = f[:f.find('.bundles')]+"_filtered_to_"+str(POINTS_PER_FIBER)+f[f.find('.bundles'):]
-        # print(    "./resampling/resampling "+f+" "+output_f+" "+str(POINTS_PER_FIBER))
-        os.system("./resampling/resampling "+f+" "+output_f+" "+str(POINTS_PER_FIBER))
-
-        # Borramos el archivo con los datos filtrados, de esta forma solo queda el filtrado y resampleado
-        os.system("rm "+f)
-        os.system("rm "+f+"data")
-        
     #     break
     # break
