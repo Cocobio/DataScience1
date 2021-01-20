@@ -11,7 +11,8 @@ def get_list_of_files(directory):
     dirs = [f for f in listdir(directory) if not isfile(join(directory, f))]
     return files, dirs
 
-directory = '/home/cocobio/Documents/ARCHI_Database/'
+# directory = '/home/cocobio/Documents/ARCHI_Database/'
+directory = 'D:/Codes/UDEC/Database/2020/ARCHI/'
 fiber_dir = '/OverSampledFibers/'
 transform_dir_file = '/TransformMatrices/T2_to_Tal_tr_tmp.trm'
 
@@ -38,8 +39,8 @@ for subject in subjects:
         if not os.path.exists(f_tal[:f_tal.rindex('/')]):
             os.makedirs(f_tal[:f_tal.rindex('/')])
 
-        # print("python3 talairach/talairach.py "+f+" "+f_tal+" "+subject_fibers_talairach_matrix)
-        os.system("python3 talairach/talairach.py "+f+" "+f_tal+" "+subject_fibers_talairach_matrix)
+        # print("python talairach/talairach.py "+f+" "+f_tal+" "+subject_fibers_talairach_matrix)
+        os.system("python talairach/talairach.py "+f+" "+f_tal+" "+subject_fibers_talairach_matrix)
 
     #     break
     # break

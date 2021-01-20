@@ -14,7 +14,8 @@ def get_list_of_files(directory):
     dirs = [f for f in listdir(directory) if not isfile(join(directory, f))]
     return files, dirs
 
-directory = '/home/cocobio/Documents/ARCHI_Database/'
+# directory = '/home/cocobio/Documents/ARCHI_Database/'
+directory = 'D:/Codes/UDEC/Database/2020/ARCHI/'
 fiber_dir = '/OverSampledFibers/'
 files, subjects = get_list_of_files(directory)
 subjects.sort()
@@ -33,19 +34,24 @@ for subject in subjects:
 
         # Eliminamos las fibras muy pequenias
         f_filtered = f[:f.find('.bundles')]+"_filtered_under_"+str(MIN_LENGTH)+f[f.find('.bundles'):]
-        # print(    "python3 filtering/filtering.py "+f+" "+f_filtered+" "+str(MIN_LENGTH))
-        os.system("python3 filtering/filtering.py "+f+" "+f_filtered+" "+str(MIN_LENGTH))
+        # print(    "python filtering/filtering.py "+f+" "+f_filtered+" "+str(MIN_LENGTH))
+        os.system("python filtering/filtering.py "+f+" "+f_filtered+" "+str(MIN_LENGTH))
 
         f = f_filtered
 
         # Resampling a 21 puntos
         output_f = f[:f.find('.bundles')]+"_filtered_to_"+str(POINTS_PER_FIBER)+f[f.find('.bundles'):]
         # print(    "./resampling/resampling "+f+" "+output_f+" "+str(POINTS_PER_FIBER))
-        os.system("./resampling/resampling "+f+" "+output_f+" "+str(POINTS_PER_FIBER))
+
 
         # Borramos el archivo con los datos filtrados, de esta forma solo queda el filtrado y resampleado
-        os.system("rm "+f)
-        os.system("rm "+f+"data")
+        if os.name == 'nt':
+            os.system("resampling\\resampling.exe "+f+" "+output_f+" "+str(POINTS_PER_FIBER))
+        else:
+            os.system("./resampling/resampling "+f+" "+output_f+" "+str(POINTS_PER_FIBER))
+        
+        os.remove(f)
+        os.remove(f+"data")
         
     #     break
     # break

@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from FFClust import IOFibers
 import os
+import shutil
 
 Cluster_F = "FFClust"
 
@@ -13,7 +14,8 @@ def get_list_of_files(directory):
     dirs = [f for f in listdir(directory) if not isfile(join(directory, f))]
     return files, dirs
 
-directory = '/home/cocobio/Documents/ARCHI_Database/'
+# directory = '/home/cocobio/Documents/ARCHI_Database/'
+directory = 'D:/Codes/UDEC/Database/2020/ARCHI/'
 fiber_dir = '/OverSampledFibers/'
 files, subjects = get_list_of_files(directory)
 subjects.sort()
@@ -32,14 +34,18 @@ for subject in subjects:
     for f_path in fibers:
         f = subject_fibers_path + f_path
 
-        # print("python3 FFClust/main.py --infile "+f+" --outdir "+subject_fibers_path+Cluster_F)
-        os.system("python3 FFClust/main.py --infile "+f+" --outdir "+subject_fibers_path+Cluster_F)
+        # print("python FFClust/main.py --infile "+f+" --outdir "+subject_fibers_path+Cluster_F)
+        os.system("python FFClust/main.py --infile "+f+" --outdir "+subject_fibers_path+Cluster_F)
 
         f_cluster = f[:f.find('.bundles')]+"_centroids"+f[f.find('.bundles'):]
-        os.system("mv "+subject_fibers_path+Cluster_F+"/centroids.bundles "+f_cluster)
-        os.system("mv "+subject_fibers_path+Cluster_F+"/centroids.bundlesdata "+f_cluster+"data")
+        # os.system("mv "+subject_fibers_path+Cluster_F+"/centroids.bundles "+f_cluster)
+        # os.system("mv "+subject_fibers_path+Cluster_F+"/centroids.bundlesdata "+f_cluster+"data")
 
-        os.system("rm -r "+subject_fibers_path+Cluster_F)
+        shutil.move(subject_fibers_path+Cluster_F+"/centroids.bundles", f_cluster)
+        shutil.move(subject_fibers_path+Cluster_F+"/centroids.bundlesdata", f_cluster+"data")
+
+        # os.system("rm -r "+subject_fibers_path+Cluster_F)
+        shutil.rmtree(subject_fibers_path+Cluster_F)
         
     #     break
     # break
