@@ -5,3 +5,12 @@
 *.jpg
 
 **/__pycache__
+
+*.npy
+
+*.so
+
+*.exe
+*.o
+
+*.png

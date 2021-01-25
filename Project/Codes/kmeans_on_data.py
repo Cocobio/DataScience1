@@ -29,23 +29,24 @@ for subject in subjects:
     fibers, tmp = get_list_of_files(subject_fibers_path)
     del tmp
     
-    fibers = [f for f in fibers if f.endswith('.bundles') and f.find("to_21") != -1]
+    fibers = [f for f in fibers if f.endswith('.bundles') and f.find("to_21") != -1 and f.find("centroids") == -1]
 
     for f_path in fibers:
         f = subject_fibers_path + f_path
 
-        # print("python FFClust/main.py --infile "+f+" --outdir "+subject_fibers_path+Cluster_F)
-        os.system("python FFClust/main.py --infile "+f+" --outdir "+subject_fibers_path+Cluster_F)
+        # print("python FFClust/main.py --infile "+f+" --outdir "+subject_fibers_path+Cluster_F+f_path)
+        os.system("python FFClust/main.py --infile "+f+" --outdir "+subject_fibers_path+Cluster_F+f_path[:f_path.rindex('.')])
 
         f_cluster = f[:f.find('.bundles')]+"_centroids"+f[f.find('.bundles'):]
         # os.system("mv "+subject_fibers_path+Cluster_F+"/centroids.bundles "+f_cluster)
         # os.system("mv "+subject_fibers_path+Cluster_F+"/centroids.bundlesdata "+f_cluster+"data")
 
-        shutil.move(subject_fibers_path+Cluster_F+"/centroids.bundles", f_cluster)
-        shutil.move(subject_fibers_path+Cluster_F+"/centroids.bundlesdata", f_cluster+"data")
+        shutil.move(subject_fibers_path+Cluster_F+f_path[:f_path.rindex('.')]+"/centroids.bundles", f_cluster)
+        shutil.move(subject_fibers_path+Cluster_F+f_path[:f_path.rindex('.')]+"/centroids.bundlesdata", f_cluster+"data")
 
+        # Originalmente estaba borrando los datos, pero lo necesito para verificar los clusters usando los ids de los centroides que escupa mi modelo 
         # os.system("rm -r "+subject_fibers_path+Cluster_F)
-        shutil.rmtree(subject_fibers_path+Cluster_F)
+        # shutil.rmtree(subject_fibers_path+Cluster_F)
         
     #     break
     # break

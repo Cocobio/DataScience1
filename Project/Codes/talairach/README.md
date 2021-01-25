@@ -1,2 +1,2 @@
 Compile:
-gcc -fPIC -shared  -O3 -o functions.so functions.c -fopenmp -ffast-math
+gcc -fPIC -shared  -O3 -o functions.so functions.c  -ffast-math
